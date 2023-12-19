@@ -1,19 +1,46 @@
-import { useState } from "react";
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { deposit, withdraw, requestLoan, payLoan } from './accountSlice';
 
 function AccountOperations() {
-  const [depositAmount, setDepositAmount] = useState("");
-  const [withdrawalAmount, setWithdrawalAmount] = useState("");
-  const [loanAmount, setLoanAmount] = useState("");
-  const [loanPurpose, setLoanPurpose] = useState("");
-  const [currency, setCurrency] = useState("USD");
+  const [depositAmount, setDepositAmount] = useState('');
+  const [withdrawalAmount, setWithdrawalAmount] = useState('');
+  const [loanAmount, setLoanAmount] = useState('');
+  const [loanPurpose, setLoanPurpose] = useState('');
+  const [currency, setCurrency] = useState('USD');
 
-  function handleDeposit() {}
+  const dispatch = useDispatch();
+  const account = useSelector((state) => state.account);
 
-  function handleWithdrawal() {}
+  useEffect(() => {
+    console.log(account);
+  }, [account]);
 
-  function handleRequestLoan() {}
+  function handleDeposit() {
+    if (!depositAmount) return;
 
-  function handlePayLoan() {}
+    dispatch(deposit(depositAmount));
+    setDepositAmount('');
+  }
+
+  function handleWithdrawal() {
+    if (!withdrawalAmount) return;
+
+    dispatch(withdraw(withdrawalAmount));
+    setWithdrawalAmount('');
+  }
+
+  function handleRequestLoan() {
+    if (!loanAmount || !loanPurpose) return;
+
+    dispatch(requestLoan(loanAmount, loanPurpose));
+    setLoanAmount('');
+    setLoanPurpose('');
+  }
+
+  function handlePayLoan() {
+    dispatch(payLoan());
+  }
 
   return (
     <div>
@@ -65,11 +92,12 @@ function AccountOperations() {
           />
           <button onClick={handleRequestLoan}>Request loan</button>
         </div>
-
-        <div>
-          <span>Pay back $X</span>
-          <button onClick={handlePayLoan}>Pay loan</button>
-        </div>
+        {account.loan > 0 && (
+          <div>
+            <span>Pay back ${account.loan}</span>
+            <button onClick={handlePayLoan}>Pay loan</button>
+          </div>
+        )}
       </div>
     </div>
   );
